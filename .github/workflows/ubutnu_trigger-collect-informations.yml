@@ -1,0 +1,123 @@
+name: Ubutnu - Trigger collect informations
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+    outputs:
+      ReleaseName:
+        value: ${{ jobs.Get-Build-Metadata.outputs.ReleaseName }}
+      ReleaseTag:
+        value: ${{ jobs.Get-Build-Metadata.outputs.ReleaseTag }}
+      HclFile:
+        value: ${{ jobs.Get-Build-Metadata.outputs.HclFile }}
+      ReleaseNo:
+        value: ${{ jobs.Get-Build-Metadata.outputs.ReleaseNo }}
+      HCloudObjectName:
+        value: ${{ jobs.Get-Build-Metadata.outputs.HCloudObjectName }}
+      HCloudServerImage:
+        value: ${{ jobs.Get-Build-Metadata.outputs.HCloudServerImage }}
+      ReadmeFile:
+        value: ${{ jobs.Get-Build-Metadata.outputs.ReadmeFile }}
+      GitHubPrLabels:
+        value: ${{ jobs.Get-Build-Metadata.outputs.GitHubPrLabels }}
+
+
+permissions:
+  contents: read
+  
+
+jobs:
+  Get-Build-Metadata:
+    runs-on: ubuntu-latest
+    name: Collect build metadata
+      
+    steps:     
+      - name: Define the name of the OS
+        id: os
+        run: |         
+          if [ "${{ inputs.os }}" == "ubuntu22" ]; then
+            echo "osname=Ubuntu 22.04" >> $GITHUB_OUTPUT
+            echo "packerfile=ubuntu-22_04" >> $GITHUB_OUTPUT
+            echo "osimage=ubuntu-22.04" >> $GITHUB_OUTPUT
+            echo "readme=Ubuntu2204-Readme.md" >> $GITHUB_OUTPUT
+            echo "ghprlabels=OS: Ubuntu,OS: Ubuntu22" >> $GITHUB_OUTPUT
+            
+          elif [ "${{ inputs.os }}" == "ubuntu24" ]; then
+            echo "osname=Ubuntu 24.04" >> $GITHUB_OUTPUT
+            echo "packerfile=ubuntu-24_04" >> $GITHUB_OUTPUT
+            echo "osimage=ubuntu-24.04" >> $GITHUB_OUTPUT
+            echo "readme=Ubuntu2404-Readme.md" >> $GITHUB_OUTPUT
+            echo "ghprlabels=OS: Ubuntu,OS: Ubuntu24" >> $GITHUB_OUTPUT
+            
+          else
+            exit 1
+          fi
+
+
+      - name: Checkout the current repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    
+
+      - name: Create a new release name/tag
+        id: releasetagname
+        run: |
+        
+          # Determines the current date in YYYYMMDD format. Using the Europe/Berlin timezone.
+          CURRENT_DATE=$(TZ='Europe/Berlin' date +'%Y%m%d')
+
+          # Formats the GitHub run number to exactly 4 digits and pads missing digits with leading zeros.
+          RUN_NUMBER=$(printf "%04d" "${GITHUB_RUN_NUMBER}")
+
+          # Contains the current attempt number of the same workflow run. This value increases when the workflow is re-run.
+          RUN_ATTEMPT=${{ github.run_attempt }}
+
+          # Builds the version string using the format: YYYYMMDD.RUN_NUMBER.RUN_ATTEMPT. Example: 20260523.0042.1
+          echo "fullver=$(echo $CURRENT_DATE.$RUN_NUMBER.$RUN_ATTEMPT)" >> $GITHUB_OUTPUT
+
+          # Builds the version string using the format: YYYYMMDD.RUN_NUMBER. Example: 20260523.0042
+          echo "longver=$(echo $CURRENT_DATE.$RUN_NUMBER)" >> $GITHUB_OUTPUT
+
+          # Builds the version string using the format: YYYYMMDD. Example: 20260523
+          echo "shortver=$(echo $CURRENT_DATE)" >> $GITHUB_OUTPUT
+
+
+    outputs:
+      ReleaseName: ${{ steps.os.outputs.osname }} (${{ steps.releasetagname.outputs.fullver }}) Image Update
+      ReleaseTag: ${{ inputs.os }}/${{ steps.releasetagname.outputs.longver }}
+      HclFile:  ${{ steps.os.outputs.packerfile }}
+      ReleaseNo: ${{ steps.releasetagname.outputs.fullver }}
+      HCloudObjectName: ${{ inputs.os }}-${{ steps.releasetagname.outputs.fullver }}
+      HCloudServerImage: ${{ steps.os.outputs.osimage }}
+      ReadmeFile: ${{ steps.os.outputs.readme }}
+      GitHubPrLabels: "${{ inputs.os }}/${{ steps.releasetagname.outputs.longver }},${{ steps.os.outputs.ghprlabels }}"
+
+
+  Show-Build-Metadata:
+    runs-on: ubuntu-latest
+    name: Show build metadata
+    needs: Get-Build-Metadata
+     
+    steps:
+      - name: Display ReleaseName
+        run: echo "${{ needs.Get-Build-Metadata.outputs.ReleaseName }}"
+
+      - name: Display ReleaseTag
+        run: echo "${{ needs.Get-Build-Metadata.outputs.ReleaseTag }}"
+
+      - name: Display HCL filename
+        run: echo "${{ needs.Get-Build-Metadata.outputs.HclFile }}"
+
+      - name: Display Release name
+        run: echo "${{ needs.Get-Build-Metadata.outputs.ReleaseNo }}"
+
+      - name: Display Hetzner Object Name (Server, Snapshot, Labels,etc.)
+        run: echo "${{ needs.Get-Build-Metadata.outputs.HCloudObjectName }}"
+
+      - name: Display Hetzner Sever Image name
+        run: echo "${{ needs.Get-Build-Metadata.outputs.HCloudServerImage }}"
+
+      - name: Display GitHub Pull Request Labels
+        run: echo "${{ needs.Get-Build-Metadata.outputs.GitHubPrLabels }}"

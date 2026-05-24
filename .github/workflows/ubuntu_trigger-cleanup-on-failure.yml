@@ -1,0 +1,82 @@
+name: Ubuntu - Trigger cleanup on failure
+
+on:
+  workflow_call:
+    inputs:
+      ReleaseTag:
+        required: true
+        type: string
+      HCloudObjectName:
+        required: true
+        type: string
+        
+
+permissions:
+  contents: read
+  
+  
+jobs:
+  Delete-NewBranch:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+          
+      - name: Delete previously created branch
+        uses: dawidd6/action-delete-branch@d1efac9a6f7a9b408d4e8ff663a99c1fbac17b3f  # v3.1.0
+        with:
+          github_token: ${{ steps.generate-token.outputs.token }}
+          branches: releases/${{ inputs.ReleaseTag }}
+
+
+  Delete-HetznerRessources:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install Hetzner Cloud Cli
+        uses: hetznercloud/setup-hcloud@ac9e7d74fb41a3ca44a6a3da123bd5aa70731e3a # v2.0.0
+        
+      - name: Delete temporary SSH Key on Hetzner Cloud
+        run: |
+          sshkey_id=$(hcloud ssh-key list --output "columns=ID" --output "noheader" -l "server=$HCLOUD_NAME")
+
+          if [ ! -z "$sshkey_id" ]; then
+            hcloud ssh-key delete $sshkey_id
+            echo "The ssh key was succcessfully deleted."
+          fi
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+          HCLOUD_NAME: ${{ inputs.HCloudObjectName }}
+
+      - name: Delete Server on Hetzner Cloud
+        run: |
+          server_id=$(hcloud server list --output "columns=ID" --output "noheader" -l "server=$HCLOUD_NAME")
+
+          if [ ! -z "$server_id" ]; then
+            hcloud server delete $server_id
+            echo "The server was succcessfully deleted."
+          else 
+            echo "No server found with the given label."
+          fi
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+          HCLOUD_NAME: ${{ inputs.HCloudObjectName }}
+
+      - name: Delete Snapshot on Hetzner Cloud
+        run: |
+          snapshot_id=$(hcloud image list --output "columns=ID" --output "noheader" --type "snapshot" -l "server=$HCLOUD_NAME")
+
+          if [ ! -z "$snapshot_id" ]; then
+            hcloud image delete $snapshot_id
+            echo "The snapshot was succcessfully deleted."
+          else 
+            echo "No snapshot found with the given label."
+          fi
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+          HCLOUD_NAME: ${{ inputs.HCloudObjectName }}

@@ -1,0 +1,43 @@
+name: Manage - Sync fork (Branch main)
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+
+permissions:
+      contents: read
+
+
+jobs:
+  update_external_airflow_fork:
+    name: Sync branch main with origin
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:     
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_SRP_ID }}
+          private-key: ${{ secrets.GH_APP_SRP_PRIVATE_KEY }}
+
+      - name: Checkout Code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Synchronize the given branch now
+        uses: TobKed/github-forks-sync-action@2fb78daa46a630ff56455a63dec51ff00ba56e23 #v0.4.0
+        with:
+          github_token: ${{ steps.generate-token.outputs.token }}
+          upstream_repository: actions/runner-images
+          target_repository: ${{ github.repository }}
+          upstream_branch: main
+          target_branch: main
+          force: false
+          tags: false

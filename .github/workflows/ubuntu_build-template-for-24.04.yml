@@ -1,0 +1,114 @@
+name: Ubuntu - Build template for Ubuntu 24.04
+
+on:      
+   workflow_dispatch:
+     inputs:
+       location:
+        type: choice 
+        required: true
+        options: 
+          - hel1
+          - fsn1
+          - nbg1
+        default: "hel1"
+       servertype:
+        type: choice 
+        required: true
+        options:
+          - cx33
+          - cpx22
+          - ccx13  
+        default: "cx33"
+         
+
+env:
+  os: "ubuntu24"
+
+
+concurrency:
+  group: "runner-image-build-${{ github.workflow }}"
+  cancel-in-progress: false
+
+
+jobs:
+  Set-Variables:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Assign ENV variable to workflow variable
+        id: env
+        run: |
+           echo "os=$os" >> $GITHUB_OUTPUT
+
+      - name: Display Variable server os
+        run: echo "${{ steps.env.outputs.os }}"
+
+      - name: Display Variable server location
+        run: echo "${{ inputs.location }}"
+
+      - name: Display Variable server type
+        run: echo "${{ inputs.servertype }}"
+     
+    outputs:      
+      os: ${{ steps.env.outputs.os }}
+     
+     
+  Trigger-CollectInformations:
+    needs: Set-Variables
+    
+    permissions:
+      contents: read
+      pull-requests: read
+
+    uses: ./.github/workflows/ubutnu_trigger-collect-informations.yml
+    with:
+      os: ${{ needs.Set-Variables.outputs.os }}
+
+    
+  Trigger-ImageBuilder:
+    needs:
+      - Set-Variables
+      - Trigger-CollectInformations
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    uses: ./.github/workflows/ubuntu_trigger-build-new-templates.yml
+    with:
+      release_name: ${{ needs.Trigger-CollectInformations.outputs.ReleaseName }}
+      release_tag: ${{ needs.Trigger-CollectInformations.outputs.ReleaseTag }}
+      hcl_filename: ${{ needs.Trigger-CollectInformations.outputs.HclFile }}
+      release_no: ${{ needs.Trigger-CollectInformations.outputs.ReleaseNo }}
+      readme_file: ${{ needs.Trigger-CollectInformations.outputs.ReadmeFile }}
+      gh_pr_labels: ${{ needs.Trigger-CollectInformations.outputs.GitHubPrLabels }}
+
+      hcloud_server_location: ${{ inputs.location }}
+      hcloud_server_type: ${{ inputs.servertype }}
+      
+      hcloud_name: ${{ needs.Trigger-CollectInformations.outputs.HCloudObjectName }}
+      hcloud_server_image: ${{ needs.Trigger-CollectInformations.outputs.HCloudServerImage }}
+      
+    secrets: inherit
+
+
+  Trigger-CleanupOnFailure:
+    if: ${{ failure() || cancelled() }}
+
+    needs:
+      - Set-Variables
+      - Trigger-CollectInformations
+      - Trigger-ImageBuilder
+
+    permissions:
+      contents: write
+
+    uses: ./.github/workflows/ubuntu_trigger-cleanup-on-failure.yml
+    with:
+      ReleaseTag: ${{ needs.Trigger-CollectInformations.outputs.ReleaseTag }}
+      HCloudObjectName: ${{ needs.Trigger-CollectInformations.outputs.HCloudObjectName  }}
+
+    secrets: inherit 
