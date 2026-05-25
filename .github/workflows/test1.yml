@@ -46,6 +46,7 @@ jobs:
           ReleaseTag: "ubuntu24/20260404.1"
 
       - name: Download previous software-report.json
+        if: steps.get-previous-release.outputs.tag != ''
         id: dl-json-file
         shell: pwsh
         run: |
