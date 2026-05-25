@@ -164,6 +164,8 @@ jobs:
     permissions:
       contents: read
 
+    outputs:
+        FileContent: ${{ steps.readme.outputs.FileContent }}
 
     steps:
       - name: Generate app token
@@ -261,7 +263,6 @@ jobs:
           Write-Host "Done"
         env:
           ReadmeFile: images/ubuntu/${{ inputs.readme_file }}
-          # ReadmeFile: "images/ubuntu/Ubuntu2404-Readme.md"
           SoftwareReportCurrentFile: "software-report.json"
           SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
           ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
@@ -317,7 +318,7 @@ jobs:
           source_branch: releases/${{ inputs.release_tag }}
           target_branch: customize
           title: ${{ inputs.release_name }}
-          body: ${{ needs.Create-Report.outputs.ReadmeFileContent }}
+          body: ${{ needs.Create-Report.outputs.FileContent }}
           label: ${{ inputs.gh_pr_labels }}
           assignee: dwydler
 
@@ -350,7 +351,7 @@ jobs:
         with:
           tag: ${{ inputs.release_tag }}
           name: ${{ inputs.release_name }}
-          body: ${{ needs.Create-Report.outputs.ReadmeFileContent }}
+          body: ${{ needs.Create-Report.outputs.FileContent }}
           token: ${{ steps.generate-token.outputs.token }}
           artifacts: software-report.json,sbom.json.zip
         
