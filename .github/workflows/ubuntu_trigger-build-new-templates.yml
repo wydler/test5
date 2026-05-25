@@ -36,7 +36,7 @@ on:
 
 env:
   SBOM_FILE_NAME: "sbom.json.zip"
-  SBOM_ARTIFACT_FILE_NAME: "${{ inputs.hcloud_name }}/${{ inputs.release_no }}"
+  SBOM_ARTIFACT_FILE_NAME: "sbom.json.${{ inputs.hcloud_name }}.zip"
 
 jobs:
   Create-NewBranch:
