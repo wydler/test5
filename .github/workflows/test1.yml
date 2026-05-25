@@ -59,3 +59,9 @@ jobs:
         env:
           PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
           SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+      - name: Generate previous software-report.json
+        if: steps.get-previous-release.outputs.tag == ''
+        shell: pwsh
+        run: |
+          
