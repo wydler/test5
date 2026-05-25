@@ -17,7 +17,8 @@ on:
         options:
           - cx33
           - cpx22
-          - ccx13  
+          - ccx13
+          - ccx23
         default: "cx33"
          
 
