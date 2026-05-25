@@ -21,6 +21,13 @@ jobs:
           client-id: ${{ secrets.GH_APP_RIHC_ID }}
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
 
+      - name: Checkout new created branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: '0'
+          # ref: releases/${{ inputs.release_tag }}
+          ref: "customize"
+
       - name: Get previous Release Tag
         id: get-previous-release
         shell: pwsh
