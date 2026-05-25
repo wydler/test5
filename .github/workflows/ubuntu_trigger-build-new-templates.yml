@@ -371,7 +371,7 @@ jobs:
           source_branch: releases/${{ inputs.release_tag }}
           target_branch: customize
           title: ${{ inputs.release_name }}
-          body: ${{ needs.Create-ServerTemplate.outputs.ReadmeFileContent }}
+          body: ${{ needs.Create-Report.outputs.ReadmeFileContent }}
           label: ${{ inputs.gh_pr_labels }}
           assignee: dwydler
 
@@ -404,7 +404,7 @@ jobs:
         with:
           tag: ${{ inputs.release_tag }}
           name: ${{ inputs.release_name }}
-          body: ${{ needs.Create-ServerTemplate.outputs.ReadmeFileContent }}
+          body: ${{ needs.Create-Report.outputs.ReadmeFileContent }}
           token: ${{ steps.generate-token.outputs.token }}
           artifacts: software-report.json,sbom.json.zip
         
