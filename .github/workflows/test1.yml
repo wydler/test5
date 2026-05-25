@@ -77,3 +77,42 @@ jobs:
           cat "$env:SoftwareReportPreviousFile"
         env:
           SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+
+      - name: Generate software report differences
+        id: software-report-diff
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          Write-Host "Calculating image differences..."
+
+          helpers/software-report-base/Calculate-ImagesDifference.ps1 `
+            $env:SoftwareReportPreviousFile `
+            $env:SoftwareReportCurrentFile `
+            $env:ImagesDifferenceFile `
+            $env:ReleaseTag `
+            $env:ReadmeFile
+
+          Write-Host "Done"
+        env:
+          # ReadmeFile: images/ubuntu/${{ inputs.readme_file }}
+          ReadmeFile: "images/ubuntu/Ubuntu2404-Readme.md"
+          SoftwareReportCurrentFile: "images/ubuntu/software-report.json"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+
+      - name: Save file 'ImagesDifference.md' in variable
+        id: readme
+        run: |
+          {
+            echo 'FileContent<<EOF'
+            cat $ImagesDifferenceFile
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+        env:
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+
+      - name: Use output
+        run: |
+          echo "${{ steps.readme.outputs.FileContent }}"       
