@@ -64,4 +64,16 @@ jobs:
         if: steps.get-previous-release.outputs.tag == ''
         shell: pwsh
         run: |
-          
+          $data = @{
+            NodeType = "HeaderNode"
+            Title    = "Ubuntu"
+            Children = @()
+          }
+
+          $data |
+            ConvertTo-Json -Depth 10 |
+            Set-Content "$env:SoftwareReportPreviousFile" -Encoding utf8
+
+          cat "$env:SoftwareReportPreviousFile"
+        env:
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
