@@ -217,9 +217,132 @@ jobs:
           force: true
 
 
+  Create-Report:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+
+      - name: Checkout new created branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: '0'
+          ref: releases/${{ inputs.release_tag }}
+          # ref: "customize"
+
+      - name: Get previous Release Tag
+        id: get-previous-release
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Continue"
+     
+          Write-Host "Finding previous release for OS '$($env:ReleaseTag.Split("/")[0])'..."
+
+          $PREVIOUS_RELEASE = (
+            gh release list `
+              --repo $env:GITHUB_REPOSITORY `
+              --limit 25 `
+              --json tagName `
+              --jq ".[] | select(.tagName | startswith(`"$($env:ReleaseTag.Split("/")[0])/`")) | .tagName" |
+            Select-Object -First 1
+          ).Trim()
+
+          "tag=$PREVIOUS_RELEASE" >> $env:GITHUB_OUTPUT
+
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          ReleaseTag: ${{ inputs.release_tag }}
+          # ReleaseTag: "ubuntu24/20260404.1"
+
+      - name: Download previous software-report.json
+        if: steps.get-previous-release.outputs.tag != ''
+        id: dl-json-file
+        shell: pwsh
+        run: |
+          Write-Host "Downloading previous software report..."
+          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/software-report.json"
+
+          Invoke-WebRequest `
+            -Uri $downloadUrl `
+            -OutFile $env:SoftwareReportPreviousFile
+        env:
+          PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+      - name: Generate previous software-report.json
+        if: steps.get-previous-release.outputs.tag == ''
+        shell: pwsh
+        run: |
+          $data = @{
+            NodeType = "HeaderNode"
+            Title    = "Ubuntu"
+            Children = @()
+          }
+
+          $data |
+            ConvertTo-Json -Depth 10 |
+            Set-Content "$env:SoftwareReportPreviousFile" -Encoding utf8
+
+          cat "$env:SoftwareReportPreviousFile"
+        env:
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+
+      - name: Generate software report differences
+        id: software-report-diff
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          Write-Host "Calculating image differences..."
+
+          helpers/software-report-base/Calculate-ImagesDifference.ps1 `
+            $env:SoftwareReportPreviousFile `
+            $env:SoftwareReportCurrentFile `
+            $env:ImagesDifferenceFile `
+            $env:ReleaseTag `
+            $env:ReadmeFile
+
+          Write-Host "Done"
+        env:
+          ReadmeFile: images/ubuntu/${{ inputs.readme_file }}
+          # ReadmeFile: "images/ubuntu/Ubuntu2404-Readme.md"
+          SoftwareReportCurrentFile: "images/ubuntu/software-report.json"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+
+      - name: Save file 'ImagesDifference.md' in variable
+        id: readme
+        run: |
+          {
+            echo 'FileContent<<EOF'
+            cat $ImagesDifferenceFile
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+        env:
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+
+      - name: Use output
+        run: |
+          echo "${{ steps.readme.outputs.FileContent }}"  
+
+      - name: Remove software-report.json
+        run: |
+          rm software-report.json
+
+
   Create-PullRequest:
     needs:
-      - Create-ServerTemplate
+      - Create-Report
     runs-on: ubuntu-latest
 
     permissions:
