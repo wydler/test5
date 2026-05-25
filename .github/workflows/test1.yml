@@ -57,3 +57,4 @@ jobs:
             -OutFile $env:SoftwareReportPreviousFile
         env:
           PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
