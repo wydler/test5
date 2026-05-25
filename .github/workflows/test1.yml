@@ -25,7 +25,7 @@ jobs:
         id: get-previous-release
         shell: pwsh
         run: |
-          $ErrorActionPreference = "Stop"
+          $ErrorActionPreference = "Continue"
      
           Write-Host "Finding previous release for OS '$($env:ReleaseTag.Split("/")[0])'..."
 
