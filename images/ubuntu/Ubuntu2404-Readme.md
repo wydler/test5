@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
-- Kernel Version: 6.8.0-111-generic
-- Image Version: 20260523.0118.1
+- Kernel Version: 6.8.0-107-generic
+- Image Version: 20260525.0006.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -25,14 +25,14 @@
 ### Package Management
 - cpan 1.64
 - Helm 3.21.0
-- Homebrew 5.1.13
+- Homebrew 5.1.14
 - Miniconda 26.3.2
 - Npm 10.9.8
 - Pip 24.0
 - Pip3 24.0
 - Pipx 1.12.0
 - RubyGems 3.4.20
-- Vcpkg (build from commit 38d91be5ef)
+- Vcpkg (build from commit d015e31e90)
 - Yarn 1.22.22
 
 #### Environment variables
