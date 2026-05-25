@@ -6,7 +6,7 @@ name: test1
 
 
 jobs:
-  Set-Variables:
+  Create-Report:
     runs-on: ubuntu-latest
 
     permissions:
