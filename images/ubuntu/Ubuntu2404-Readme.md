@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
-- Kernel Version: 6.8.0-107-generic
-- Image Version: 20260525.0009.1
+- Kernel Version: 6.8.0-117-generic
+- Image Version: 20260525.0012.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -125,7 +125,7 @@ Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
 ### Haskell Tools
 - Cabal 3.16.1.0
 - GHC 9.14.1
-- GHCup 0.2.3.0
+- GHCup 0.2.5.0
 - Stack 3.9.3
 
 ### Rust Tools
