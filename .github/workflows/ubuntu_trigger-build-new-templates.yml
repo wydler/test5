@@ -399,7 +399,9 @@ jobs:
           name: ${{ inputs.release_name }}
           body: ${{ needs.Create-Report.outputs.FileContent }}
           token: ${{ steps.generate-token.outputs.token }}
-          artifacts: software-report.json,${{ env.SBOM_ARTIFACT_FILE_NAME }}
+          artifacts: |
+            software-report.json
+            ${{ env.SBOM_ARTIFACT_FILE_NAME }}
           allowUpdates: "true"
 
       - name: Delete all artifacts associated with the run 
