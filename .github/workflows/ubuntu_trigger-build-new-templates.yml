@@ -120,6 +120,10 @@ jobs:
           PACKER_LOG: ${{ vars.PACKER_LOG }}
           PACKER_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
 
+      - name: Prepare artifact
+        run: |
+          mv images/ubuntu/${{ env.SBOM_FILE_NAME }} images/ubuntu/${{ env.SBOM_ARTIFACT_FILE_NAME }}
+
       - name: Upload file software-report.json to artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
@@ -129,19 +133,19 @@ jobs:
           overwrite: true
           retention-days: 1
 
-      - name: Upload file ${{ env.SBOM_FILE_NAME }} to artifact
+      - name: Upload file ${{ env.SBOM_ARTIFACT_FILE_NAME }} to artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: ${{ env.SBOM_ARTIFACT_FILE_NAME }}
-          path: images/ubuntu/${{ env.SBOM_FILE_NAME }}
+          path: images/ubuntu/${{ env.SBOM_ARTIFACT_FILE_NAME }}
           if-no-files-found: error
           overwrite: true
           retention-days: 1
 
-      - name: Remove ${{ env.SBOM_FILE_NAME }} and software-report.json
+      - name: Remove ${{ env.SBOM_ARTIFACT_FILE_NAME }} and software-report.json
         run: |
           rm images/ubuntu/software-report.json
-          rm images/ubuntu/${{ env.SBOM_FILE_NAME }}
+          rm images/ubuntu/${{ env.SBOM_ARTIFACT_FILE_NAME }}
 
       - name: Commit & Push changes
         uses: actions-js/push@5a7cbd780d82c0c937b5977586e641b2fd94acc5 # v1.5
