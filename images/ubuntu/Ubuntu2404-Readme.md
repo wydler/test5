@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
 - Kernel Version: 6.8.0-90-generic
-- Image Version: 20260526.0015.1
+- Image Version: 20260526.0016.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
