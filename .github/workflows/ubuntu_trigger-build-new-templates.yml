@@ -125,6 +125,7 @@ jobs:
 
       - name: Prepare artifact
         run: |
+          ls -lisa
           mv images/ubuntu/${{ env.SBOM_FILE_NAME }} images/ubuntu/${{ env.SBOM_ARTIFACT_FILE_NAME }}
           mv images/ubuntu/${{ env.SWRP_FILE_NAME }} images/ubuntu/${{ env.SWRP_ARTIFACT_FILE_NAME }}
 
