@@ -85,7 +85,7 @@ jobs:
 
 
     outputs:
-      ReleaseName: ${{ steps.os.outputs.osname }} (${{ steps.releasetagname.outputs.shortver }}) Image Update
+      ReleaseName: ${{ steps.os.outputs.osname }} (${{ steps.releasetagname.outputs.fullver }}) Image Update
       ReleaseTag: ${{ inputs.os }}/${{ steps.releasetagname.outputs.longver }}
       HclFile:  ${{ steps.os.outputs.packerfile }}
       ReleaseNo: ${{ steps.releasetagname.outputs.fullver }}
