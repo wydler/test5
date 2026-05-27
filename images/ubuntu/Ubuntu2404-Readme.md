@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
 - Kernel Version: 6.8.0-117-generic
-- Image Version: 20260527.0022.1
+- Image Version: 20260527.0023.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -32,7 +32,7 @@
 - Pip3 24.0
 - Pipx 1.12.0
 - RubyGems 3.4.20
-- Vcpkg (build from commit 9b965a1168)
+- Vcpkg (build from commit 1bf999414d)
 - Yarn 1.22.22
 
 #### Environment variables
@@ -102,7 +102,7 @@ to accomplish this.
 - AWS SAM CLI 1.161.0
 - Azure CLI 2.86.0
 - Azure CLI (azure-devops) 1.0.4
-- GitHub CLI 2.92.0
+- GitHub CLI 2.93.0
 - Google Cloud CLI 570.0.0
 
 ### Java
@@ -138,7 +138,7 @@ Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
 - Rustfmt 1.9.0
 
 ### Browsers and Drivers
-- Google Chrome 148.0.7778.178
+- Google Chrome 148.0.7778.215
 - ChromeDriver 148.0.7778.178
 - Chromium 148.0.7778.0
 - Microsoft Edge 148.0.3967.83
