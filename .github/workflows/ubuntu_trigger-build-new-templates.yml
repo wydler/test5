@@ -123,9 +123,8 @@ jobs:
           PACKER_LOG: ${{ vars.PACKER_LOG }}
           PACKER_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-      - name: Prepare artifact
+      - name: Prepare artifacts
         run: |
-          ls -lisa images/ubuntu/
           mv images/ubuntu/${{ env.SBOM_FILE_NAME }} images/ubuntu/${{ env.SBOM_ARTIFACT_FILE_NAME }}
           mv images/ubuntu/${{ env.SWRP_FILE_NAME }} images/ubuntu/${{ env.SWRP_ARTIFACT_FILE_NAME }}
 
