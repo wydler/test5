@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
-- Kernel Version: 6.8.0-111-generic
-- Image Version: 20260527.0018.1
+- Kernel Version: 6.8.0-90-generic
+- Image Version: 20260527.0020.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -103,7 +103,7 @@ to accomplish this.
 - Azure CLI 2.86.0
 - Azure CLI (azure-devops) 1.0.4
 - GitHub CLI 2.92.0
-- Google Cloud CLI 569.0.0
+- Google Cloud CLI 570.0.0
 
 ### Java
 | Version              | Environment Variable |
@@ -201,7 +201,7 @@ Use the following command as a part of your job to start the service: 'sudo syst
 #### PyPy
 - 3.9.19 [PyPy 7.3.16]
 - 3.10.16 [PyPy 7.3.19]
-- 3.11.15 [PyPy 7.3.22]
+- 3.11.15 [PyPy 7.3.23]
 
 #### Ruby
 - 3.2.11
