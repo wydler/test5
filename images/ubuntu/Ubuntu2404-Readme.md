@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
-- Kernel Version: 6.8.0-117-generic
-- Image Version: 20260527.0023.1
+- Kernel Version: 6.8.0-90-generic
+- Image Version: 20260528.0026.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -32,7 +32,7 @@
 - Pip3 24.0
 - Pipx 1.12.0
 - RubyGems 3.4.20
-- Vcpkg (build from commit 1bf999414d)
+- Vcpkg (build from commit 216bb6975d)
 - Yarn 1.22.22
 
 #### Environment variables
@@ -97,7 +97,7 @@ to accomplish this.
 - Ninja 1.13.2
 
 ### CLI Tools
-- AWS CLI 2.34.54
+- AWS CLI 2.34.55
 - AWS CLI Session Manager Plugin 1.2.814.0
 - AWS SAM CLI 1.161.0
 - Azure CLI 2.86.0
@@ -116,7 +116,7 @@ to accomplish this.
 
 ### PHP Tools
 - PHP: 8.3.6
-- Composer 2.9.8
+- Composer 2.10.0
 - PHPUnit 8.5.52
 ```
 Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
@@ -144,7 +144,7 @@ Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
 - Microsoft Edge 148.0.3967.83
 - Microsoft Edge WebDriver 148.0.3967.83
 - Selenium server 4.44.0
-- Mozilla Firefox 151.0.1
+- Mozilla Firefox 151.0.2
 - Geckodriver 0.36.0
 
 #### Environment variables
