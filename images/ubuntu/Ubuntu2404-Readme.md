@@ -1,7 +1,7 @@
 # Ubuntu 24.04
 - OS Version: 24.04.4 LTS
 - Kernel Version: 6.8.0-111-generic
-- Image Version: 20260523.0118.1
+- Image Version: 20260528.0030.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
@@ -25,14 +25,14 @@
 ### Package Management
 - cpan 1.64
 - Helm 3.21.0
-- Homebrew 5.1.13
+- Homebrew 5.1.14
 - Miniconda 26.3.2
 - Npm 10.9.8
 - Pip 24.0
 - Pip3 24.0
 - Pipx 1.12.0
 - RubyGems 3.4.20
-- Vcpkg (build from commit 38d91be5ef)
+- Vcpkg (build from commit 9e53836916)
 - Yarn 1.22.22
 
 #### Environment variables
@@ -69,7 +69,7 @@ to accomplish this.
 - Docker-Buildx 0.34.1
 - Docker Client 28.0.4
 - Docker Server 28.0.4
-- Fastlane 2.234.0
+- Fastlane 2.235.0
 - Git 2.54.0
 - Git LFS 3.7.1
 - Git-ftp 1.6.0
@@ -88,7 +88,7 @@ to accomplish this.
 - Packer 1.15.3
 - Parcel 2.16.4
 - Podman 4.9.3
-- Pulumi 3.243.0
+- Pulumi 3.244.0
 - Skopeo 1.13.3
 - Sphinx Open Source Search Server 2.2.11
 - yamllint 1.38.0
@@ -97,13 +97,13 @@ to accomplish this.
 - Ninja 1.13.2
 
 ### CLI Tools
-- AWS CLI 2.34.53
+- AWS CLI 2.34.56
 - AWS CLI Session Manager Plugin 1.2.814.0
 - AWS SAM CLI 1.161.0
 - Azure CLI 2.86.0
 - Azure CLI (azure-devops) 1.0.4
-- GitHub CLI 2.92.0
-- Google Cloud CLI 569.0.0
+- GitHub CLI 2.93.0
+- Google Cloud CLI 570.0.0
 
 ### Java
 | Version              | Environment Variable |
@@ -116,7 +116,7 @@ to accomplish this.
 
 ### PHP Tools
 - PHP: 8.3.6
-- Composer 2.9.8
+- Composer 2.10.0
 - PHPUnit 8.5.52
 ```
 Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
@@ -125,26 +125,26 @@ Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
 ### Haskell Tools
 - Cabal 3.16.1.0
 - GHC 9.14.1
-- GHCup 0.2.3.0
+- GHCup 0.2.5.0
 - Stack 3.9.3
 
 ### Rust Tools
-- Cargo 1.95.0
-- Rust 1.95.0
-- Rustdoc 1.95.0
+- Cargo 1.96.0
+- Rust 1.96.0
+- Rustdoc 1.96.0
 - Rustup 1.29.0
 
 #### Packages
 - Rustfmt 1.9.0
 
 ### Browsers and Drivers
-- Google Chrome 148.0.7778.178
+- Google Chrome 148.0.7778.215
 - ChromeDriver 148.0.7778.178
 - Chromium 148.0.7778.0
-- Microsoft Edge 148.0.3967.83
+- Microsoft Edge 148.0.3967.96
 - Microsoft Edge WebDriver 148.0.3967.83
 - Selenium server 4.44.0
-- Mozilla Firefox 151.0.1
+- Mozilla Firefox 151.0.2
 - Geckodriver 0.36.0
 
 #### Environment variables
@@ -201,7 +201,7 @@ Use the following command as a part of your job to start the service: 'sudo syst
 #### PyPy
 - 3.9.19 [PyPy 7.3.16]
 - 3.10.16 [PyPy 7.3.19]
-- 3.11.15 [PyPy 7.3.22]
+- 3.11.15 [PyPy 7.3.23]
 
 #### Ruby
 - 3.2.11
