@@ -341,7 +341,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs:
-      - Create-Report
+      - Create-PullRequest
 
     permissions:
       contents: write
