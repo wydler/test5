@@ -65,7 +65,6 @@ jobs:
 
     permissions:
       contents: write
-      pull-requests: read
 
     outputs:
       ReadmeFileContent: ${{ steps.readme.outputs.FileContent }}
