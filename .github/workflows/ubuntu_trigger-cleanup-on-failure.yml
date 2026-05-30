@@ -101,7 +101,8 @@ jobs:
       
           echo "=== Docker Hub Tag Deletion ==="
           echo "Repository : ${ACCOUNT}/${REPOSITORY}"
-          echo "Tag        : ${TAG}\n\n"
+          echo "Tag        : ${TAG}"
+          echo
           
           # Authenticate against Docker Hub and retrieve a JWT token
           echo "Requesting Docker Hub authentication token..."
@@ -109,13 +110,15 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" \
             | jq -r .token)
-
+          echo
+          
           # Verify that a token was returned
           if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
             echo "ERROR: Failed to obtain Docker Hub authentication token."
             exit 1
           else
             echo "Authentication successful."
+            echo
           fi
 
           # Check whether the tag exists before attempting deletion
@@ -133,6 +136,7 @@ jobs:
             exit 1
           else
             echo "Tag found. Deleting..."
+            echo
           fi
 
           DELETE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
