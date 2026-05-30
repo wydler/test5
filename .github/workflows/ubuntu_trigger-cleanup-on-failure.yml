@@ -9,11 +9,20 @@ on:
       HCloudObjectName:
         required: true
         type: string
-        
+      registry_account:
+        required: true
+        type: string
+      registry_repo:
+        required: true
+        type: string
+      release_no:
+        required: true
+        type: string
+
 
 permissions:
   contents: read
-  
+
   
 jobs:
   Delete-NewBranch:
@@ -80,3 +89,24 @@ jobs:
         env:
           HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
           HCLOUD_NAME: ${{ inputs.HCloudObjectName }}
+
+
+  Delete-ContainerTag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete Docker Hub tag
+        run: |
+          TOKEN=$(curl -s -X POST https://hub.docker.com/v2/users/login/ \
+            -H "Content-Type: application/json" \
+            -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" \
+            | jq -r .token)
+      
+          curl -f -X DELETE \
+            -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/${{ inputs.REGISTRY_ACCOUNT }}/${{ inputs.registry_repo }}/tags/$TAG/"
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          REPOSITORY: ${{ secrets.registry_repo }}
+          TAG: ${{ inputs.release_no }}
