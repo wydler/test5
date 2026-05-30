@@ -37,6 +37,14 @@ on:
         required: false
         type: string
         default: "images/ubuntu-slim"
+      SWRP_FILE_NAME:
+        required: false
+        type: string
+        default: "${{ inputs.SWRP_FILE_NAME }}"
+      SWRP_PREVIOUS_FILE_NAME:
+        required: false
+        type: string
+        default: "${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"
 
 
 jobs:
@@ -130,20 +138,19 @@ jobs:
           bash generate-software-report.sh "$docker_tag"
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
-          # docker_tag: "wydler/test5:20260530.0008.1"
 
       - name: Upload file software-report.json to artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
-          name: ubuntu-slim-Report.json
-          path: ./${{ inputs.workingdir }}/ubuntu-slim-Report.json
+          name: ${{ inputs.SWRP_FILE_NAME }}
+          path: ./${{ inputs.workingdir }}/${{ inputs.SWRP_FILE_NAME }}
           if-no-files-found: error
           overwrite: true
           retention-days: 1
 
-      - name: Remove ubuntu-slim-Report.json
+      - name: Remove ${{ inputs.SWRP_FILE_NAME }}
         run: |
-          rm ./${{ inputs.workingdir }}/ubuntu-slim-Report.json
+          rm ./${{ inputs.workingdir }}/${{ inputs.SWRP_FILE_NAME }}
 
       - name: Commit & Push changes
         uses: actions-js/push@5a7cbd780d82c0c937b5977586e641b2fd94acc5 # v1.5
@@ -204,15 +211,15 @@ jobs:
       - name: Download file software-report.json from artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
         with:
-          name: ubuntu-slim-Report.json
+          name: ${{ inputs.SWRP_FILE_NAME }}
 
-      - name: Download previous ubuntu-slim-Report.json
+      - name: Download previous ${{ inputs.SWRP_FILE_NAME }}
         if: steps.get-previous-release.outputs.tag != ''
         id: dl-json-file
         shell: pwsh
         run: |
           Write-Host "Downloading previous software report..."
-          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/ubuntu-slim-Report.json"
+          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ inputs.SWRP_FILE_NAME }}"
           Write-Host $downloadUrl
           
           Invoke-WebRequest `
@@ -220,9 +227,9 @@ jobs:
             -OutFile $env:SoftwareReportPreviousFile
         env:
           PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
-          SoftwareReportPreviousFile: "${{ runner.temp }}/ubuntu-slim-Report.json"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_FILE_NAME }}"
 
-      - name: Generate previous ubuntu-slim-Report.json
+      - name: Generate previous ${{ inputs.SWRP_FILE_NAME }}
         if: steps.get-previous-release.outputs.tag == ''
         shell: pwsh
         run: |
@@ -238,7 +245,7 @@ jobs:
 
           cat "$env:SoftwareReportPreviousFile"
         env:
-          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"
 
       - name: Generate software report differences
         id: software-report-diff
@@ -257,11 +264,11 @@ jobs:
 
           Write-Host "Done"
         env:
-          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"          
-          SoftwareReportCurrentFile: "ubuntu-slim-Report.json"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"          
+          SoftwareReportCurrentFile: "${{ inputs.SWRP_FILE_NAME }}"
           ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
           ReleaseTag: ${{ inputs.release_tag }}
-          ReadmeFile: images/ubuntu/${{ inputs.readme_file }}          
+          ReadmeFile: ./${{ inputs.workingdir }}/${{ inputs.readme_file }}          
 
       - name: Save file 'ImagesDifference.md' in variable
         id: readme
@@ -278,9 +285,9 @@ jobs:
         run: |
           echo "${{ steps.readme.outputs.FileContent }}"  
 
-      - name: Remove ubuntu-slim-Report.json
+      - name: Remove ${{ inputs.SWRP_FILE_NAME }}
         run: |
-          rm ubuntu-slim-Report.json
+          rm ${{ inputs.SWRP_FILE_NAME }}
 
 
   Create-PullRequest:
@@ -351,10 +358,10 @@ jobs:
           client-id: ${{ secrets.GH_APP_RIHC_ID }}
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
 
-      - name: Download file ubuntu-slim-Report.json from artifact
+      - name: Download file ${{ inputs.SWRP_FILE_NAME }} from artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
         with:
-          name: ubuntu-slim-Report.json
+          name: ${{ inputs.SWRP_FILE_NAME }}
 
       - name: Create a new release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
@@ -364,10 +371,10 @@ jobs:
           body: ${{ needs.Create-Report.outputs.FileContent }}
           token: ${{ steps.generate-token.outputs.token }}
           artifacts: |
-            ubuntu-slim-Report.json
+            ${{ inputs.SWRP_FILE_NAME }}
 
       - name: Delete all artifacts associated with the run 
         uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118  # v6.0.0
         with:
           name: |
-            ubuntu-slim-Report.json   
+            ${{ inputs.SWRP_FILE_NAME }}   
