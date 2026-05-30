@@ -110,7 +110,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" \
             | jq -r .token)
-          echo
           
           # Verify that a token was returned
           if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
@@ -136,7 +135,6 @@ jobs:
             exit 1
           else
             echo "Tag found. Deleting..."
-            echo
           fi
 
           DELETE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
