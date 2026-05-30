@@ -87,4 +87,10 @@ jobs:
       readme_file: ${{ needs.Trigger-CollectInformations.outputs.ReadmeFile }}
       gh_pr_labels: ${{ needs.Trigger-CollectInformations.outputs.GitHubPrLabels }}
       
+      registry: ${{ vars.REGISTRY }}
+      registry_account: ${{ vars.REGISTRY_ACCOUNT }}
+      registry_repo: ${{ vars.REGISTRY_REPO }}
+      registry_repo_tag_cache_name: ${{ vars.REGISTRY_REPO_TAG_CACHE_NAME }}
+      registry_platforms: ${{ vars.REGISTRY_PLATFORMS }}
+      
     secrets: inherit
