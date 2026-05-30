@@ -151,6 +151,6 @@ jobs:
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          ACCOUNT: ${{ inputs.REGISTRY_ACCOUNT }}
+          ACCOUNT: ${{ inputs.registry_account }}
           REPOSITORY: ${{ inputs.registry_repo }}
           TAG: ${{ inputs.release_no }}
