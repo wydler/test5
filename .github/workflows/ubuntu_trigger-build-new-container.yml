@@ -131,13 +131,14 @@ jobs:
       - name: Generating software report
         shell: bash
         run: |
-          # docker image pull "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
+          #
           docker image pull $docker_tag
 
+          #
           cd ./${{ inputs.workingdir }}/
-          bash generate-software-report.sh "$docker_tag"
 
-          ls -lisa
+          #
+          bash generate-software-report.sh "$docker_tag"
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
 
