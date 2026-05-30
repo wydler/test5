@@ -69,3 +69,22 @@ jobs:
     with:
       os: ${{ needs.Set-Variables.outputs.os }}
 
+
+  Trigger-ImageBuilder:
+    needs:
+      - Set-Variables
+      - Trigger-CollectInformations
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    uses: ./.github/workflows/ubuntu_trigger-build-new-container.yml
+    with:
+      release_name: ${{ needs.Trigger-CollectInformations.outputs.ReleaseName }}
+      release_tag: ${{ needs.Trigger-CollectInformations.outputs.ReleaseTag }}
+      release_no: ${{ needs.Trigger-CollectInformations.outputs.ReleaseNo }}
+      readme_file: ${{ needs.Trigger-CollectInformations.outputs.ReadmeFile }}
+      gh_pr_labels: ${{ needs.Trigger-CollectInformations.outputs.GitHubPrLabels }}
+      
+    secrets: inherit
