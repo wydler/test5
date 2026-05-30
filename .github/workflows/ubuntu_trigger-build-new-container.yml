@@ -1,0 +1,363 @@
+name: Ubuntu - Trigger build new Container
+
+on:
+  workflow_call:
+    inputs:
+      release_name:
+        required: true
+        type: string
+      release_tag:
+        required: true
+        type: string
+      release_no:
+        required: true
+        type: string
+      readme_file:
+        required: true
+        type: string       
+      gh_pr_labels:
+        required: true
+        type: string
+
+
+jobs:
+  Create-NewBranch:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+    
+      - name: Create a new branch
+        uses: peterjgrainger/action-create-branch@4b81ce657e255acd677cc6c55c9c763654be3aef # v4.0.0
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+        with:
+          branch: releases/${{ inputs.release_tag }}
+
+          
+  Create-ContainerImage:
+    runs-on: ubuntu-latest
+    needs: Create-NewBranch
+    
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:       
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+
+      - name: Checkout new created branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: releases/${{ inputs.release_tag }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5  # v4.1.0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee  # v4.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create tag list for docker image
+        id: tags
+        run: |
+
+          # basename does remove the directory prefix of a path
+          # https://stackoverflow.com/questions/3294072/get-last-dirname-filename-in-a-file-path-argument-in-bash
+          container_tag=$(basename ${{ github.ref_name }})
+          echo $container_tag
+
+          #
+          echo "docker=${{ env.REGISTRY_ACCOUNT }}/${{ env.REGISTRY_REPO }}:latest, ${{ env.REGISTRY_ACCOUNT }}/${{ env.REGISTRY_REPO }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
+        with:
+          context: images/ubuntu-slim/
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            IMAGE_VERSION=${{ inputs.release_no }}
+            IMAGE_OWNER=${{ github.repository_owner }}
+          tags: ${{ steps.tags.outputs.docker }}
+          platforms: ${{ env.REGISTRY_PLATFORMS }}
+          cache-from: type=registry,ref=${{ env.REGISTRY_ACCOUNT }}/${{ env.REGISTRY_REPO }}:${{ env.REGISTRY_REPO_TAG_CACHE_NAME }}
+          cache-to: type=registry,ref=${{ env.REGISTRY_ACCOUNT }}/${{ env.REGISTRY_REPO }}:${{ env.REGISTRY_REPO_TAG_CACHE_NAME }},mode=max
+
+
+  Create-Report:
+    runs-on: ubuntu-latest
+    needs:
+      - Create-ContainerImage
+
+    permissions:
+      contents: read
+
+    outputs:
+        FileContent: ${{ steps.readme.outputs.FileContent }}
+
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+
+      - name: Checkout new created branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: '0'
+          ref: releases/${{ inputs.release_tag }}
+
+      - name: Get previous Release Tag
+        id: get-previous-release
+        shell: pwsh
+        run: |
+          # Continue execution even if a command writes a non-terminating error
+          $ErrorActionPreference = "Continue"
+
+          # Extract the OS name from the release tag (e.g. ubuntu24/20260525.0003 -> ubuntu24)
+          Write-Host "Finding previous release for OS '$($env:ReleaseTag.Split("/")[0])'..."
+
+          # Query the latest releases from GitHub and filter by OS prefix
+          $PREVIOUS_RELEASE = (
+            gh release list `
+              --repo $env:GITHUB_REPOSITORY `
+              --limit 25 `
+              --json tagName `
+              --jq ".[] | select(.tagName | startswith(`"$($env:ReleaseTag.Split("/")[0])/`")) | .tagName" |
+
+            # Select the first matching release tag from the result list
+            Select-Object -First 1
+          ).Trim()
+
+          # Export the detected release tag as a GitHub Actions step output
+          "tag=$PREVIOUS_RELEASE" >> $env:GITHUB_OUTPUT
+
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          ReleaseTag: ${{ inputs.release_tag }}
+          # ReleaseTag: "ubuntu24/20260404.1"
+
+      - name: Download file ${{ env.SWRP_ARTIFACT_FILE_NAME }} from artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+
+      - name: Download previous ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+        if: steps.get-previous-release.outputs.tag != ''
+        id: dl-json-file
+        shell: pwsh
+        run: |
+          # Log the current operation to the workflow output
+          Write-Host "Downloading previous software report..."
+
+          # Build the download URL for the ${{ env.SWRP_ARTIFACT_FILE_NAME }} asset
+          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ env.SWRP_ARTIFACT_FILE_NAME }}"
+
+          # Download the software report from the previous release and save it to the temporary runner directory
+          Invoke-WebRequest `
+            -Uri $downloadUrl `
+            -OutFile $env:SoftwareReportPreviousFile
+        env:
+          PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+      - name: Generate previous ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+        if: steps.get-previous-release.outputs.tag == ''
+        shell: pwsh
+        run: |
+          # Create a PowerShell object representing the initial JSON structure
+          $data = @{
+            NodeType = "HeaderNode"
+            Title    = "Ubuntu"
+            Children = @()
+          }
+
+          # Convert the PowerShell object to formatted JSON and save it as UTF-8 encoded file
+          $data |
+            ConvertTo-Json -Depth 10 |
+            Set-Content "$env:SoftwareReportPreviousFile" -Encoding utf8
+
+          # Print the generated JSON file to the workflow log
+          cat "$env:SoftwareReportPreviousFile"
+        env:
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"
+
+      - name: Generate software report differences
+        id: software-report-diff
+        shell: pwsh
+        run: |
+          # Stop script execution immediately if a command fails
+          $ErrorActionPreference = "Stop"
+
+          # Log the current workflow operation
+          Write-Host "Calculating image differences..."
+
+          # Execute the PowerShell script that compares the previous and current software reports and generates a markdown difference report
+          #
+          # Parameters:
+          # 1. Previous software report JSON file
+          # 2. Current software report JSON file
+          # 3. Output markdown file for image differences
+          # 4. Current release tag
+          # 5. README file path
+          helpers/software-report-base/Calculate-ImagesDifference.ps1 `
+            $env:SoftwareReportPreviousFile `
+            $env:SoftwareReportCurrentFile `
+            $env:ImagesDifferenceFile `
+            $env:ReleaseTag `
+            $env:ReadmeFile
+
+          # Log successful completion
+          Write-Host "Done"
+        env:
+          SoftwareReportPreviousFile: "${{ runner.temp }}/software-report.previous.json"          
+          SoftwareReportCurrentFile: "${{ env.SWRP_ARTIFACT_FILE_NAME }}"
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+          ReleaseTag: ${{ inputs.release_tag }}
+          ReadmeFile: images/ubuntu/${{ inputs.readme_file }}          
+
+      - name: Save file 'ImagesDifference.md' in variable
+        id: readme
+        run: |
+          # Read the generated markdown report file and expose its content as a GitHub Actions step output named "FileContent"
+          # Multi-line output syntax:
+          # FileContent<<EOF
+          # <content>
+          # EOF
+          #
+          {
+            echo 'FileContent<<EOF'
+
+            # Print the content of the markdown file
+            cat $ImagesDifferenceFile
+
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+        env:
+          ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
+
+      - name: Use output
+        run: |
+          echo "${{ steps.readme.outputs.FileContent }}"  
+
+      - name: Remove ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+        run: |
+          rm ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+
+
+  Create-PullRequest:
+    runs-on: ubuntu-latest
+
+    needs:
+      - Create-Report
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+
+      - name: Checkout new created branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: '0'
+          ref: releases/${{ inputs.release_tag }}
+
+      - name: Create pull request
+        id: pullrequest
+        uses: devops-infra/action-pull-request@b2895bff2ff66579f6704d717a1ea75fad919e84 # v1.0.2
+        with:
+          github_token: ${{ steps.generate-token.outputs.token }}
+          source_branch: releases/${{ inputs.release_tag }}
+          target_branch: customize
+          title: ${{ inputs.release_name }}
+          body: ${{ needs.Create-Report.outputs.FileContent }}
+          label: ${{ inputs.gh_pr_labels }}
+          assignee: dwydler
+
+      - name: Merge the pull request
+        uses: pascalgn/automerge-action@7961b8b5eec56cc088c140b56d864285eabd3f67 # v0.16.4
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PULL_REQUEST: ${{ steps.pullrequest.outputs.pr_number }}
+          MERGE_LABELS: ${{ inputs.release_tag }}
+          UPDATE_LABELS: ${{ inputs.release_tag }}
+          MERGE_COMMIT_MESSAGE: "${{ inputs.release_name }} (#${{ steps.pullrequest.outputs.pr_number }})"
+          MERGE_METHOD: "squash"
+          MERGE_RETRIES: 10
+          MERGE_RETRY_SLEEP: 30000 # milliseconds
+          MERGE_READY_STATE: clean
+
+
+  Create-Release:
+    runs-on: ubuntu-latest
+
+    needs:
+      - Create-Report
+      - Create-PullRequest
+      
+    permissions:
+      contents: write
+
+    steps:
+      - name: Generate app token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          client-id: ${{ secrets.GH_APP_RIHC_ID }}
+          private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
+
+      - name: Download file ${{ env.SWRP_ARTIFACT_FILE_NAME }} from artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+
+      - name: Download file ${{ env.SBOM_ARTIFACT_FILE_NAME }} from artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: ${{ env.SBOM_ARTIFACT_FILE_NAME }}
+
+      - name: Create a new release
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
+        with:
+          tag: ${{ inputs.release_tag }}
+          name: ${{ inputs.release_name }}
+          body: ${{ needs.Create-Report.outputs.FileContent }}
+          token: ${{ steps.generate-token.outputs.token }}
+          artifacts: |
+            ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+            ${{ env.SBOM_ARTIFACT_FILE_NAME }}
+          allowUpdates: "true"
+
+      - name: Delete all artifacts associated with the run 
+        uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118  # v6.0.0
+        with:
+          name: |
+            ${{ env.SWRP_ARTIFACT_FILE_NAME }}
+            ${{ env.SBOM_ARTIFACT_FILE_NAME }}
