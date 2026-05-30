@@ -100,8 +100,8 @@ jobs:
           set -euo pipefail
       
           echo "=== Docker Hub Tag Deletion ==="
-          echo "Repository : $ACCOUNT/${REPOSITORY}"
-          echo "Tag        : ${TAG}"
+          echo "Repository : ${ACCOUNT}/${REPOSITORY}"
+          echo "Tag        : ${TAG}\n\n"
           
           # Authenticate against Docker Hub and retrieve a JWT token
           echo "Requesting Docker Hub authentication token..."
@@ -123,7 +123,7 @@ jobs:
 
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: JWT ${TOKEN}" \
-            "https://hub.docker.com/v2/repositories/$ACCOUNT/$REPOSITORY/tags/$TAG/")
+            "https://hub.docker.com/v2/repositories/${ACCOUNT}/$REPOSITORY}/tags/$TAG}/")
       
           if [ "${HTTP_CODE}" = "404" ]; then
             echo "Tag '${TAG}' does not exist. Nothing to delete."
@@ -138,7 +138,7 @@ jobs:
           DELETE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
             -X DELETE \
             -H "Authorization: JWT ${TOKEN}" \
-            "https://hub.docker.com/v2/repositories/$ACCOUNT/$REPOSITORY/tags/$TAG/")
+            "https://hub.docker.com/v2/repositories/${ACCOUNT}/${REPOSITORY}/tags/${TAG}/")
 
           if [ "${DELETE_CODE}" = "204" ]; then
             echo "SUCCESS: Tag '${TAG}' deleted."
