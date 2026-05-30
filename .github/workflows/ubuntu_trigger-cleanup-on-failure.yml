@@ -97,16 +97,58 @@ jobs:
     steps:
       - name: Delete Docker Hub tag
         run: |
+          set -euo pipefail
+      
+          echo "=== Docker Hub Tag Deletion ==="
+          echo "Repository : $ACCOUNT/${REPOSITORY}"
+          echo "Tag        : ${TAG}"
+          
+          # Authenticate against Docker Hub and retrieve a JWT token
+          echo "Requesting Docker Hub authentication token..."
           TOKEN=$(curl -s -X POST https://hub.docker.com/v2/users/login/ \
             -H "Content-Type: application/json" \
             -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" \
             | jq -r .token)
+
+          # Verify that a token was returned
+          if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
+            echo "ERROR: Failed to obtain Docker Hub authentication token."
+            exit 1
+          else
+            echo "Authentication successful."
+          fi
+
+          # Check whether the tag exists before attempting deletion
+          echo "Checking whether tag '${TAG}' exists..."
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: JWT ${TOKEN}" \
+            "https://hub.docker.com/v2/repositories/$ACCOUNT/$REPOSITORY/tags/$TAG/")
       
-          curl -f -X DELETE \
-            -H "Authorization: JWT $TOKEN" \
-            "https://hub.docker.com/v2/repositories/${{ inputs.REGISTRY_ACCOUNT }}/${{ inputs.registry_repo }}/tags/$TAG/"
+          if [ "${HTTP_CODE}" = "404" ]; then
+            echo "Tag '${TAG}' does not exist. Nothing to delete."
+            exit 0
+          elif [ "${HTTP_CODE}" != "200" ]; then
+            echo "ERROR: Failed to query tag. HTTP status: ${HTTP_CODE}"
+            exit 1
+          else
+          echo "Tag found. Deleting..."
+          fi
+
+          DELETE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X DELETE \
+            -H "Authorization: JWT ${TOKEN}" \
+            "https://hub.docker.com/v2/repositories/$ACCOUNT/$REPOSITORY/tags/$TAG/")
+
+          if [ "${DELETE_CODE}" = "204" ]; then
+            echo "SUCCESS: Tag '${TAG}' deleted."
+          else
+            echo "ERROR: Failed to delete tag. HTTP status: ${DELETE_CODE}"
+            exit 1
+          fi
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          ACCOUNT: ${{ secrets.REGISTRY_ACCOUNT }}
           REPOSITORY: ${{ secrets.registry_repo }}
           TAG: ${{ inputs.release_no }}
