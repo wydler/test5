@@ -40,7 +40,7 @@ on:
       SWRP_FILE_NAME:
         required: false
         type: string
-        default: "ubuntu-slim-Report.json"
+        default: "ubuntu-slim-Report.json2"
       SWRP_PREVIOUS_FILE_NAME:
         required: false
         type: string
