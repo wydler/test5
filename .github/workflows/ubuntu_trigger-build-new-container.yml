@@ -40,7 +40,7 @@ on:
       SWRP_FILE_NAME:
         required: false
         type: string
-        default: "ubuntu-slim-Report.json2"
+        default: "ubuntu-slim-Report.json"
       SWRP_PREVIOUS_FILE_NAME:
         required: false
         type: string
@@ -225,7 +225,7 @@ jobs:
           $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ inputs.SWRP_FILE_NAME }}"
           Write-Host $downloadUrl
           
-          Invoke-WebRequest `
+          Invoke-WebRequest2 `
             -Uri $downloadUrl `
             -OutFile $env:SoftwareReportPreviousFile
         env:
