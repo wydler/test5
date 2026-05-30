@@ -119,6 +119,7 @@ jobs:
       - name: Generating software report
         shell: bash
         run: |
+          chmod +x ./images/ubuntu-slim/generate-software-report.sh
           ./images/ubuntu-slim/generate-software-report.sh "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
 
       - name: Commit & Push changes
