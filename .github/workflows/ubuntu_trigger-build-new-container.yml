@@ -108,11 +108,11 @@ jobs:
 
           # basename does remove the directory prefix of a path
           # https://stackoverflow.com/questions/3294072/get-last-dirname-filename-in-a-file-path-argument-in-bash
-          container_tag=$(basename ${{ github.ref_name }})
-          echo $container_tag
+          # container_tag=$(basename ${{ github.ref_name }})
+          # echo $container_tag
 
           #
-          echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest, ${{ inputs.REGISTRY_ACCOUNT }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
+          echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest, ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
@@ -225,7 +225,7 @@ jobs:
           $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ inputs.SWRP_FILE_NAME }}"
           Write-Host $downloadUrl
           
-          Invoke-WebRequest2 `
+          Invoke-WebRequest `
             -Uri $downloadUrl `
             -OutFile $env:SoftwareReportPreviousFile
         env:
