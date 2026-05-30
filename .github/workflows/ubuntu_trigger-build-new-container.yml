@@ -227,7 +227,7 @@ jobs:
             -OutFile $env:SoftwareReportPreviousFile
         env:
           PREVIOUS_RELEASE: ${{ steps.get-previous-release.outputs.tag }}
-          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_FILE_NAME }}"
+          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"
 
       - name: Generate previous ${{ inputs.SWRP_FILE_NAME }}
         if: steps.get-previous-release.outputs.tag == ''
