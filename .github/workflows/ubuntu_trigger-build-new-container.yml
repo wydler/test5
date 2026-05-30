@@ -136,10 +136,12 @@ jobs:
 
           cd ./${{ inputs.workingdir }}/
           bash generate-software-report.sh "$docker_tag"
+
+          ls -lisa
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
 
-      - name: Upload file software-report.json to artifact
+      - name: Upload file ${{ inputs.SWRP_FILE_NAME }} to artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: ${{ inputs.SWRP_FILE_NAME }}
