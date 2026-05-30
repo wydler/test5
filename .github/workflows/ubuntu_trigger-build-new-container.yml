@@ -35,7 +35,7 @@ on:
         type: string
 
 env:
-  SWRP_FILE_NAME: "software-report.json"
+  SWRP_FILE_NAME: "ubuntu-slim-Report.json"
   SWRP_ARTIFACT_FILE_NAME: "software-report.previous.json"
 
 
