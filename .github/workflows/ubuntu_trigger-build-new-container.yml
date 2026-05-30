@@ -106,7 +106,7 @@ jobs:
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
         with:
           context: ./images/ubuntu-slim/
-          file: Dockerfile
+          file: ./images/ubuntu-slim/Dockerfile
           push: true
           build-args: |
             IMAGE_VERSION=${{ inputs.release_no }}
