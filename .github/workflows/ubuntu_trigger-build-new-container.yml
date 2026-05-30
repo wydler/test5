@@ -212,7 +212,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Downloading previous software report..."
-          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/software-report.json"
+          $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/ubuntu-slim-Report.json"
           Write-Host $downloadUrl
           
           Invoke-WebRequest `
