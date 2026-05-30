@@ -120,6 +120,7 @@ jobs:
           context: ./${{ inputs.workingdir }}/
           file: ./${{ inputs.workingdir }}/Dockerfile
           push: true
+          load: true
           build-args: |
             IMAGE_VERSION=${{ inputs.release_no }}
             IMAGE_OWNER=${{ github.repository_owner }}
@@ -132,7 +133,7 @@ jobs:
         shell: bash
         run: |
           #
-          docker image pull $docker_tag
+          # docker image pull $docker_tag
 
           #
           cd ./${{ inputs.workingdir }}/
