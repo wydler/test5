@@ -132,7 +132,7 @@ jobs:
             echo "ERROR: Failed to query tag. HTTP status: ${HTTP_CODE}"
             exit 1
           else
-          echo "Tag found. Deleting..."
+            echo "Tag found. Deleting..."
           fi
 
           DELETE_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
