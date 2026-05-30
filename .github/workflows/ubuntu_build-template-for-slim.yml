@@ -110,6 +110,10 @@ jobs:
     uses: ./.github/workflows/ubuntu_trigger-cleanup-on-failure.yml
     with:
       ReleaseTag: ${{ needs.Trigger-CollectInformations.outputs.ReleaseTag }}
+      release_no: ${{ needs.Trigger-CollectInformations.outputs.ReleaseNo }}
       HCloudObjectName: ${{ needs.Trigger-CollectInformations.outputs.HCloudObjectName  }}
+
+      registry_account: ${{ vars.REGISTRY_ACCOUNT }}
+      registry_repo: ${{ vars.REGISTRY_REPO }}
 
     secrets: inherit 
