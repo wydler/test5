@@ -33,6 +33,10 @@ on:
       gh_pr_labels:
         required: true
         type: string
+      workingdir:
+        required: false
+        type: string
+        default: "images/ubuntu-slim"
 
 
 jobs:
@@ -105,8 +109,8 @@ jobs:
 #      - name: Build and push
 #        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
 #        with:
-#          context: ./images/ubuntu-slim/
-#          file: ./images/ubuntu-slim/Dockerfile
+#          context: ./${{ inputs.workingdir }}/
+#          file: ./${{ inputs.workingdir }}/Dockerfile
 #          push: true
 #          build-args: |
 #            IMAGE_VERSION=${{ inputs.release_no }}
@@ -122,7 +126,7 @@ jobs:
           # docker image pull "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
           docker image pull $docker_tag
 
-          cd ./images/ubuntu-slim/
+          cd ./${{ inputs.workingdir }}/
           bash generate-software-report.sh "$docker_tag"
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
@@ -132,14 +136,14 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: ubuntu-slim-Report.json
-          path: images/ubuntu-slim/ubuntu-slim-Report.json
+          path: ./${{ inputs.workingdir }}/ubuntu-slim-Report.json
           if-no-files-found: error
           overwrite: true
           retention-days: 1
 
-      - name: Remove /ubuntu-slim-Report.json
+      - name: Remove ubuntu-slim-Report.json
         run: |
-          rm images/ubuntu-slim/ubuntu-slim-Report.json
+          rm ./${{ inputs.workingdir }}/ubuntu-slim-Report.json
 
       - name: Commit & Push changes
         uses: actions-js/push@5a7cbd780d82c0c937b5977586e641b2fd94acc5 # v1.5
