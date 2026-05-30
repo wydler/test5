@@ -40,11 +40,11 @@ on:
       SWRP_FILE_NAME:
         required: false
         type: string
-        default: "${{ inputs.SWRP_FILE_NAME }}"
+        default: "ubuntu-slim-Report.json"
       SWRP_PREVIOUS_FILE_NAME:
         required: false
         type: string
-        default: "${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"
+        default: "software-report.previous.json"
 
 
 jobs:
