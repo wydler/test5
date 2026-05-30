@@ -117,3 +117,7 @@ jobs:
           cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
 
  
+      - name: Generating software report
+        shell: bash
+        run: |
+          ./images/ubuntu-slim/generate-software-report.sh "${{ inputs.REGISTRY_ACCOUNT }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
