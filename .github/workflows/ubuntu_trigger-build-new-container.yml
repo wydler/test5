@@ -116,8 +116,14 @@ jobs:
           cache-from: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }}
           cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
 
- 
       - name: Generating software report
         shell: bash
         run: |
           ./images/ubuntu-slim/generate-software-report.sh "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
+
+      - name: Commit & Push changes
+        uses: actions-js/push@5a7cbd780d82c0c937b5977586e641b2fd94acc5 # v1.5
+        with:
+          branch: releases/${{ inputs.release_tag }}
+          github_token: ${{ steps.generate-token.outputs.token }}
+          force: true
