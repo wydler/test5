@@ -106,19 +106,19 @@ jobs:
           #
           echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest, ${{ inputs.REGISTRY_ACCOUNT }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
 
-#      - name: Build and push
-#        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
-#        with:
-#          context: ./${{ inputs.workingdir }}/
-#          file: ./${{ inputs.workingdir }}/Dockerfile
-#          push: true
-#          build-args: |
-#            IMAGE_VERSION=${{ inputs.release_no }}
-#            IMAGE_OWNER=${{ github.repository_owner }}
-#          tags: ${{ steps.tags.outputs.docker }}
-#          platforms: ${{ inputs.registry_platforms }}
-#          cache-from: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }}
-#          cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
+      - name: Build and push
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
+        with:
+          context: ./${{ inputs.workingdir }}/
+          file: ./${{ inputs.workingdir }}/Dockerfile
+          push: true
+          build-args: |
+            IMAGE_VERSION=${{ inputs.release_no }}
+            IMAGE_OWNER=${{ github.repository_owner }}
+          tags: ${{ steps.tags.outputs.docker }}
+          platforms: ${{ inputs.registry_platforms }}
+          cache-from: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }}
+          cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
 
       - name: Generating software report
         shell: bash
