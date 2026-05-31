@@ -10,7 +10,7 @@ permissions:
 env:
   os: "ubuntu-slim"
 
-  REGISTRY: ${{ vars.REGISTRY }}
+  REGISTRY:  # ${{ vars.REGISTRY }}
   REGISTRY_ACCOUNT: ${{ vars.REGISTRY_ACCOUNT }}
   REGISTRY_REPO: ${{ vars.REGISTRY_REPO }}
   REGISTRY_REPO_TAG_CACHE_NAME: ${{ vars.REGISTRY_REPO_TAG_CACHE_NAME }}
@@ -33,9 +33,9 @@ jobs:
           for var in \
             REGISTRY \
             REGISTRY_ACCOUNT \
-            REGISTRY_REPO2 \
+            REGISTRY_REPO \
             REGISTRY_REPO_TAG_CACHE_NAME \
-            REGISTRY_PLATFORMS2
+            REGISTRY_PLATFORMS
           do
             if [[ -z "${!var}" ]]; then
               echo "::error::Repository variable '$var' is missing"
