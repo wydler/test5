@@ -102,19 +102,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Create tag list for docker image
-        id: tags
-        run: |
-
-          # basename does remove the directory prefix of a path
-          # https://stackoverflow.com/questions/3294072/get-last-dirname-filename-in-a-file-path-argument-in-bash
-          # container_tag=$(basename ${{ github.ref_name }})
-          # echo $container_tag
-
-          #
-          # echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest,${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
-          echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
-
       - name: Build and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
         with:
@@ -125,7 +112,7 @@ jobs:
           build-args: |
             IMAGE_VERSION=${{ inputs.release_no }}
             IMAGE_OWNER=${{ github.repository_owner }}
-          tags: ${{ steps.tags.outputs.docker }}
+          tags: ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}
           platforms: ${{ inputs.registry_platforms }}
           cache-from: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }}
           cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
@@ -394,7 +381,7 @@ jobs:
             ${{ inputs.SWRP_FILE_NAME }}   
 
 
-  Publish-Container:
+  Publish-ContainerImage:
     runs-on: ubuntu-slim
 
     needs:
