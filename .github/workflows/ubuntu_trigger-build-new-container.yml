@@ -73,7 +73,7 @@ jobs:
 
 
   Create-ContainerImage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: Create-NewBranch
 
     permissions:
@@ -291,7 +291,7 @@ jobs:
 
 
   Create-PullRequest:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     needs:
       - Create-Report
