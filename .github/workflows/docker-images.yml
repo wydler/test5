@@ -33,6 +33,5 @@ jobs:
 
       - name: Run test.sh
         working-directory: ${{ matrix.directory }}
-        run: ./test.sh
-        env:
-          IMAGE_NAME: test5:latest
+        run: bash ./test.sh
+
