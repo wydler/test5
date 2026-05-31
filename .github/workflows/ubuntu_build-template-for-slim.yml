@@ -21,8 +21,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check-requirements:
-    name: Check Requirements
+  Check-Requirements:
     runs-on: ubuntu-slim
 
     steps:
@@ -32,11 +31,11 @@ jobs:
           missing=0
   
           for var in \
-            REGISTRY2 \
+            REGISTRY \
             REGISTRY_ACCOUNT \
             REGISTRY_REPO \
             REGISTRY_REPO_TAG_CACHE_NAME \
-            REGISTRY_PLATFORMS
+            REGISTRY_PLATFORMS2
           do
             if [[ -z "${!var}" ]]; then
               echo "::error::Repository variable '$var' is missing"
@@ -49,7 +48,9 @@ jobs:
 
   Set-Variables:
     runs-on: ubuntu-slim
-    needs: check-requirements
+    
+    needs:
+      - Check-Requirements
 
     permissions:
       contents: read
