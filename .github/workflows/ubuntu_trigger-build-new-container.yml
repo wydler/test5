@@ -113,7 +113,7 @@ jobs:
 
           #
           # echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest,${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
-          echo "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
+          echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
