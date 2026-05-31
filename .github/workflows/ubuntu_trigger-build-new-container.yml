@@ -291,7 +291,7 @@ jobs:
 
 
   Create-PullRequest:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
 
     needs:
       - Create-Report
