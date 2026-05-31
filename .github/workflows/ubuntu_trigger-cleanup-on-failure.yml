@@ -1,6 +1,7 @@
+---
 name: Ubuntu - Trigger cleanup on failure
 
-on:
+"on":
   workflow_call:
     inputs:
       ReleaseTag:
@@ -23,19 +24,19 @@ on:
 permissions:
   contents: read
 
-  
+
 jobs:
   Delete-NewBranch:
     runs-on: ubuntu-latest
     
     steps:
       - name: Generate app token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         id: generate-token
         with:
           client-id: ${{ secrets.GH_APP_RIHC_ID }}
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
-          
+
       - name: Delete previously created branch
         uses: dawidd6/action-delete-branch@d1efac9a6f7a9b408d4e8ff663a99c1fbac17b3f  # v3.1.0
         with:
@@ -45,11 +46,11 @@ jobs:
 
   Delete-HetznerRessources:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Install Hetzner Cloud Cli
-        uses: hetznercloud/setup-hcloud@ac9e7d74fb41a3ca44a6a3da123bd5aa70731e3a # v2.0.0
-        
+        uses: hetznercloud/setup-hcloud@ac9e7d74fb41a3ca44a6a3da123bd5aa70731e3a  # v2.0.0
+
       - name: Delete temporary SSH Key on Hetzner Cloud
         run: |
           sshkey_id=$(hcloud ssh-key list --output "columns=ID" --output "noheader" -l "server=$HCLOUD_NAME")
@@ -69,7 +70,7 @@ jobs:
           if [ ! -z "$server_id" ]; then
             hcloud server delete $server_id
             echo "The server was succcessfully deleted."
-          else 
+          else
             echo "No server found with the given label."
           fi
         env:
@@ -83,7 +84,7 @@ jobs:
           if [ ! -z "$snapshot_id" ]; then
             hcloud image delete $snapshot_id
             echo "The snapshot was succcessfully deleted."
-          else 
+          else
             echo "No snapshot found with the given label."
           fi
         env:
@@ -98,19 +99,19 @@ jobs:
       - name: Delete Docker Hub tag
         run: |
           set -euo pipefail
-      
+
           echo "=== Docker Hub Tag Deletion ==="
           echo "Repository : ${ACCOUNT}/${REPOSITORY}"
           echo "Tag        : ${TAG}"
           echo
-          
+
           # Authenticate against Docker Hub and retrieve a JWT token
           echo "Requesting Docker Hub authentication token..."
           TOKEN=$(curl -s -X POST https://hub.docker.com/v2/users/login/ \
             -H "Content-Type: application/json" \
             -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" \
             | jq -r .token)
-          
+
           # Verify that a token was returned
           if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
             echo "ERROR: Failed to obtain Docker Hub authentication token."
@@ -126,7 +127,7 @@ jobs:
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: JWT ${TOKEN}" \
             "https://hub.docker.com/v2/repositories/${ACCOUNT}/${REPOSITORY}/tags/${TAG}/")
-      
+
           if [ "${HTTP_CODE}" = "404" ]; then
             echo "Tag '${TAG}' does not exist. Nothing to delete."
             exit 0
