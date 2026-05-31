@@ -73,7 +73,7 @@ jobs:
 
 
   Create-ContainerImage:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     needs: Create-NewBranch
 
     permissions:
