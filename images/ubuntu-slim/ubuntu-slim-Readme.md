@@ -1,7 +1,7 @@
 # Ubuntu-Slim
 - OS Version: 24.04.4 LTS
 - Kernel Version: 6.17.0-1015-azure
-- Image Version: 20260531.0054.1
+- Image Version: 20260531.0055.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
