@@ -105,10 +105,13 @@ jobs:
   Trigger-CleanupOnFailure:
     # if: ${{ failure() || cancelled() }}
     if: >
-      needs.Trigger-CollectInformations.result == 'failure' ||
-      needs.Trigger-CollectInformations.result == 'cancelled' ||
-      needs.Trigger-ImageBuilder.result == 'failure' ||
-      needs.Trigger-ImageBuilder.result == 'cancelled'
+      always() &&
+      (
+        needs.Trigger-CollectInformations.result == 'failure' ||
+        needs.Trigger-CollectInformations.result == 'cancelled' ||
+        needs.Trigger-ImageBuilder.result == 'failure' ||
+        needs.Trigger-ImageBuilder.result == 'cancelled'
+      )      
 
     needs:
       - Set-Variables
