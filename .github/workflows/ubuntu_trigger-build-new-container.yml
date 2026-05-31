@@ -222,7 +222,7 @@ jobs:
           $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ inputs.SWRP_FILE_NAME }}"
           Write-Host $downloadUrl
 
-          Invoke-WebRequest `
+          Invoke-WebRequest2 `
             -Uri $downloadUrl `
             -OutFile $env:SoftwareReportPreviousFile
         env:
