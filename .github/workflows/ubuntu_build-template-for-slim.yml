@@ -22,23 +22,29 @@ concurrency:
 
 jobs:
   check-requirements:
-    name: Requirements
+    name: Check Requirements
     runs-on: ubuntu-slim
 
-    strategy:
-      fail-fast: false
-      matrix:
-        vars: [REGISTRY, REGISTRY_ACCOUNT, REGISTRY_REPO, REGISTRY_REPO_TAG_CACHE_NAME, REGISTRY_PLATFORMS]
-
     steps:
-      - name: Check if variable exist
+      - name: Check required variables
+        shell: bash
         run: |
-          if [[ -z ${!VARNAME} ]]; then
-            echo "Variable \"${VARNAME}\" not found. Please create the variable under \"Repository variables\" \(https://github.com/${{ github.REPOSITORY}}/settings/variables/actions\)."
-            exit 1
-          fi
-        env:
-          VARNAME: "${{ matrix.vars }}"
+          missing=0
+  
+          for var in \
+            REGISTRY2 \
+            REGISTRY_ACCOUNT \
+            REGISTRY_REPO \
+            REGISTRY_REPO_TAG_CACHE_NAME \
+            REGISTRY_PLATFORMS
+          do
+            if [[ -z "${!var}" ]]; then
+              echo "::error::Repository variable '$var' is missing"
+              missing=1
+            fi
+          done
+  
+          exit $missing
 
 
   Set-Variables:
