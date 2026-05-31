@@ -191,7 +191,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = "Continue"
-     
+
           Write-Host "Finding previous release for OS '$($env:ReleaseTag.Split("/")[0])'..."
 
           $PREVIOUS_RELEASE = (
@@ -307,7 +307,7 @@ jobs:
         with:
           client-id: ${{ secrets.GH_APP_RIHC_ID }}
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
-          
+
       - name: Checkout new created branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
