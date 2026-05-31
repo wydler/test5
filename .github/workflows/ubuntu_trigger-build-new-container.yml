@@ -121,7 +121,7 @@ jobs:
         shell: bash
         working-directory: ${{ inputs.workingdir }}
         run: |
-          #
+          # Execute the container validation tests
           bash test.sh "$docker_tag"
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
@@ -129,13 +129,11 @@ jobs:
       - name: Generating software report
         shell: bash
         run: |
-          #
-          # docker image pull $docker_tag
-
-          #
+          # Change to the image-specific working directory that contains the report generation scripts
           cd ./${{ inputs.workingdir }}/
 
-          #
+          # Generate a software inventory report for the newly built container image.
+          # The report is later used for release notes and change tracking between image versions.
           bash generate-software-report.sh "$docker_tag"
         env:
           docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
@@ -399,7 +397,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Promote image to latest
+        shell: bash
         run: |
+          # Create or update the "latest" tag to point to the newly released image version.
+          # This operation updates the manifest in the registry and preserves all platform variants.
           docker buildx imagetools create \
             -t ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest \
             ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}          
