@@ -112,7 +112,8 @@ jobs:
           # echo $container_tag
 
           #
-          echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest,${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
+          # echo "docker=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest,${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
+          echo "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf  # v7.2.0
@@ -391,3 +392,27 @@ jobs:
         with:
           name: |
             ${{ inputs.SWRP_FILE_NAME }}   
+
+
+  Publish-Container:
+    runs-on: ubuntu-slim
+
+    needs:
+      - Create-Release
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee  # v4.2.0
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Promote image to latest
+        run: |
+          docker buildx imagetools create \
+            -t ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:latest \
+            ${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}          
