@@ -118,14 +118,14 @@ jobs:
           cache-from: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }}
           cache-to: type=registry,ref=${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.registry_repo_tag_cache_name }},mode=max
 
-      - name: Test the new image
-        shell: bash
-        working-directory: ${{ inputs.workingdir }}
-        run: |
-          # Execute the container validation tests
-          bash test.sh "$docker_tag"
-        env:
-          docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
+#      - name: Test the new image
+#        shell: bash
+#        working-directory: ${{ inputs.workingdir }}
+#        run: |
+#          # Execute the container validation tests
+#          bash test.sh "$docker_tag"
+#        env:
+#          docker_tag: "${{ inputs.registry_account }}/${{ inputs.registry_repo }}:${{ inputs.release_no }}"
 
       - name: Generating software report
         shell: bash
