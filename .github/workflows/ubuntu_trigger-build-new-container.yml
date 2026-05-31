@@ -1,7 +1,7 @@
 ---
 name: Ubuntu - Trigger build new container
 
-on:
+"on":
   workflow_call:
     inputs:
       registry:
@@ -63,7 +63,7 @@ jobs:
         with:
           client-id: ${{ secrets.GH_APP_RIHC_ID }}
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
-    
+
       - name: Create a new branch
         uses: peterjgrainger/action-create-branch@4b81ce657e255acd677cc6c55c9c763654be3aef  # v4.0.0
         env:
@@ -71,16 +71,16 @@ jobs:
         with:
           branch: releases/${{ inputs.release_tag }}
 
-          
+
   Create-ContainerImage:
     runs-on: ubuntu-latest
     needs: Create-NewBranch
-    
+
     permissions:
       contents: write
       pull-requests: read
 
-    steps:       
+    steps:
       - name: Generate app token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         id: generate-token
@@ -89,7 +89,7 @@ jobs:
           private-key: ${{ secrets.GH_APP_RIHC_PRIVATE_KEY }}
 
       - name: Checkout new created branch
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           ref: releases/${{ inputs.release_tag }}
 
@@ -170,7 +170,7 @@ jobs:
       contents: read
 
     outputs:
-        FileContent: ${{ steps.readme.outputs.FileContent }}
+      FileContent: ${{ steps.readme.outputs.FileContent }}
 
     steps:
       - name: Generate app token
@@ -221,7 +221,7 @@ jobs:
           Write-Host "Downloading previous software report..."
           $downloadUrl = "https://github.com/$($env:GITHUB_REPOSITORY)/releases/download/$env:PREVIOUS_RELEASE/${{ inputs.SWRP_FILE_NAME }}"
           Write-Host $downloadUrl
-          
+
           Invoke-WebRequest `
             -Uri $downloadUrl `
             -OutFile $env:SoftwareReportPreviousFile
@@ -264,11 +264,11 @@ jobs:
 
           Write-Host "Done"
         env:
-          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"          
+          SoftwareReportPreviousFile: "${{ runner.temp }}/${{ inputs.SWRP_PREVIOUS_FILE_NAME }}"
           SoftwareReportCurrentFile: "${{ inputs.SWRP_FILE_NAME }}"
           ImagesDifferenceFile: "${{ runner.temp }}/ImagesDifference.md"
           ReleaseTag: ${{ inputs.release_tag }}
-          ReadmeFile: ./${{ inputs.workingdir }}/${{ inputs.readme_file }}          
+          ReadmeFile: ./${{ inputs.workingdir }}/${{ inputs.readme_file }}
 
       - name: Save file 'ImagesDifference.md' in variable
         id: readme
@@ -283,7 +283,7 @@ jobs:
 
       - name: Use output
         run: |
-          echo "${{ steps.readme.outputs.FileContent }}"  
+          echo "${{ steps.readme.outputs.FileContent }}"
 
       - name: Remove ${{ inputs.SWRP_FILE_NAME }}
         run: |
@@ -299,7 +299,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      
+
     steps:
       - name: Generate app token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
@@ -313,7 +313,7 @@ jobs:
         with:
           fetch-depth: '0'
           ref: releases/${{ inputs.release_tag }}
-          
+
       - name: Create pull request
         id: pullrequest
         uses: devops-infra/action-pull-request@86d8692dc48a93ee5731b366f78f658eb7243a8d  # v1.1.3
@@ -336,7 +336,7 @@ jobs:
           MERGE_COMMIT_MESSAGE: "${{ inputs.release_name }} (#${{ steps.pullrequest.outputs.pr_number }})"
           MERGE_METHOD: "squash"
           MERGE_RETRIES: 10
-          MERGE_RETRY_SLEEP: 30000 # milliseconds
+          MERGE_RETRY_SLEEP: 30000  # milliseconds
           MERGE_READY_STATE: clean
 
 
@@ -373,11 +373,11 @@ jobs:
           artifacts: |
             ${{ inputs.SWRP_FILE_NAME }}
 
-      - name: Delete all artifacts associated with the run 
+      - name: Delete all artifacts associated with the run
         uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118  # v6.0.0
         with:
           name: |
-            ${{ inputs.SWRP_FILE_NAME }}   
+            ${{ inputs.SWRP_FILE_NAME }}
 
 
   Publish-ContainerImage:
