@@ -30,7 +30,7 @@ RUN echo 'set -eo pipefail' >> /etc/bash.bashrc
 RUN apt-get update && apt-get upgrade -y && apt-get install -y sudo lsb-release jq dpkg && \
     touch /run/.containerenv && \
     /tmp/scripts/build/configure-apt-sources.sh && \
-    /tmp/scripts/build/configure-apt.sh && \
+    # /tmp/scripts/build/configure-apt.sh && \
     /tmp/scripts/build/install-apt-vital.sh && \
     /tmp/scripts/build/install-ms-repos.sh && \
     /tmp/scripts/build/configure-image-data-file.sh && \
