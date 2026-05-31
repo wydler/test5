@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   Delete-NewBranch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Generate app token
@@ -45,7 +45,7 @@ jobs:
 
 
   Delete-HetznerRessources:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Install Hetzner Cloud Cli
@@ -93,7 +93,7 @@ jobs:
 
 
   Delete-ContainerTag:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Delete Docker Hub tag
