@@ -54,7 +54,7 @@ jobs:
         run: |
            echo "os=$os" >> $GITHUB_OUTPUT
 
-    outputs:      
+    outputs:
       os: ${{ steps.env.outputs.os }}
 
 
@@ -92,7 +92,6 @@ jobs:
       registry_repo: ${{ vars.REGISTRY_REPO }}
       registry_repo_tag_cache_name: ${{ vars.REGISTRY_REPO_TAG_CACHE_NAME }}
       registry_platforms: ${{ vars.REGISTRY_PLATFORMS }}
-
     secrets: inherit
 
 
@@ -115,5 +114,4 @@ jobs:
 
       registry_account: ${{ vars.REGISTRY_ACCOUNT }}
       registry_repo: ${{ vars.REGISTRY_REPO }}
-
-    secrets: inherit 
+    secrets: inherit
