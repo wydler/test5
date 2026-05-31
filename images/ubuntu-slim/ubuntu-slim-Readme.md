@@ -1,6 +1,6 @@
 # Ubuntu-Slim
 - OS Version: 24.04.4 LTS
-- Image Version: 20260531.0057.1
+- Image Version: 20260531.0058.1
 - Systemd version: 255.4-1ubuntu8.15
 
 ## Installed Software
