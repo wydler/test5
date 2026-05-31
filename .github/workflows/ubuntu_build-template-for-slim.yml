@@ -33,7 +33,7 @@ jobs:
           for var in \
             REGISTRY \
             REGISTRY_ACCOUNT \
-            REGISTRY_REPO \
+            REGISTRY_REPO2 \
             REGISTRY_REPO_TAG_CACHE_NAME \
             REGISTRY_PLATFORMS2
           do
