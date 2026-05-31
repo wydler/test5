@@ -1,5 +1,6 @@
 FROM ubuntu:24.04 AS base
 
+
 ARG IMAGE_VERSION=1.0.0
 ARG IMAGE_OWNER="GitHub"
 
